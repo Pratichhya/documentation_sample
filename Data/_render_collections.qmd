@@ -88,6 +88,29 @@ def togglescript():
 ```
 
 ```{python}
+def checkboxscript():
+    checkscript3="""<script>function togglecheck(className, displayState){
+    var elements = document.getElementsByClassName(className)
+
+    for (var i = 0; i < elements.length; i++){
+    if (elements[i].style.display === "none") {
+      elements[i].style.display = "block";
+    } else {
+      elements[i].style.display = "none";
+    }
+    }
+}</script>"""
+    return checkscript3
+
+def createcheckboxes(levelids):
+    checktext=''
+
+    for levelid in levelids:
+        checktext+=f"""<input type="checkbox" onchange=togglecheck("{levelid}","none") style="margin: 15px;" checked> {levelid}"""
+    return checktext
+```
+
+```{python}
 # include detail block
 
 def detailblock(ID,xy,time,table,link_block):
@@ -207,8 +230,8 @@ def get_availablity(c):
 
 ```{python}
 # for loop to display the content
-text = ''
-
+text = f''
+levelids=[]
 for c in meta:
 
     title = c["title"]
@@ -231,14 +254,11 @@ for c in meta:
         collectionID = ""
 
     try:
-        for i in c["data_product"]:
-            LevelID = c["data_product"][i]["Level_ID"]
-            About = c["data_product"][i]["description"]
-            levelids.append((LevelID,About))
+        LevelID=c["LevelID"]
+        
     except:
         LevelID = ""
-        About = ""
-
+    levelids.append(LevelID)
     # insert thumbnail
     thumb_url = get_thumbnail(c)
 
@@ -294,6 +314,7 @@ for c in meta:
         opensearch = ""
 
     text = text + f"""
+<div class="{LevelID}" style="display: block;">
 
 ## {title}
 
@@ -306,14 +327,12 @@ for c in meta:
 {offer}
 
 {detailblock(collectionID,spatial,temporal,table,link_block)}
-
-
+</div>
 """
-
 ```
 
 ```{python}
-text = text + togglescript()
+text = checkboxscript()+createcheckboxes(list(set(levelids)))+ text + togglescript()
 
 display(Markdown(text))
 
